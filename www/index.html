@@ -55,7 +55,11 @@ function rs(){D.st={games:0,ok:0,bad:0,w:{}};D.sess=null;sv();contShow();openPar
 function openPar(){const a=L=='ar',s=D.st,t=s.ok+s.bad,top=Object.entries(s.w).sort((x,y)=>y[1]-x[1]).slice(0,5).map(([i,n])=>`${W[i][0]} ${W[i][a?2:1]} (${n})`).join('<br>')||'—',row=(n,v)=>`<div class="tg"><span>${n}</span><b>${v}</b></div>`;
 $('pb').innerHTML=`<h2>${a?'منطقة الوالدين':'Parent area'}</h2>`+row(a?'ألعاب':'Games',s.games)+row(a?'إجابات صحيحة':'Correct',s.ok)+row(a?'محاولات خاطئة':'Wrong',s.bad)+row(a?'الدقة':'Accuracy',(t?Math.round(s.ok/t*100):0)+'%')+`<p><b>${a?'كلمات تحتاج تدريباً':'Words to practice'}</b><br>${top}</p><button class="btn w" onclick="if(this.dataset.s)rs();else{this.dataset.s=1;this.textContent='${a?'اضغط للتأكيد':'Tap to confirm'}'}">${a?'مسح التقدم':'Reset'}</button> <button class="btn" onclick="cl()">${a?'إغلاق':'Close'}</button>`;$('pan').style.display='flex'}
 let ht,mi;$('par').onpointerdown=()=>{ht=setTimeout(openPar,1200)};$('par').onpointerup=$('par').onpointerleave=()=>clearTimeout(ht);
-function music(){clearInterval(mi);if(!D.mus)return;let n=0;mi=setInterval(()=>tone([523,659,784,880,784,659][n++%6],.35,'triangle',.04),420)}
+let off=false;
+function music(){clearInterval(mi);mi=0;if(!D.mus||off)return;let n=0;mi=setInterval(()=>tone([523,659,784,880,784,659][n++%6],.35,'triangle',.04),420)}
+function bg(h){off=h;if(h){clearInterval(mi);mi=0;try{A&&A.suspend()}catch(e){}try{window.speechSynthesis&&speechSynthesis.cancel();const p=tts();p&&p.stop().catch(()=>{})}catch(e){}}else{try{A&&A.resume()}catch(e){}music()}}
+document.addEventListener('visibilitychange',()=>bg(document.hidden));addEventListener('pagehide',()=>bg(true));addEventListener('pageshow',()=>bg(false));
+try{const ap=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;ap&&ap.addListener('appStateChange',s=>bg(!s.isActive))}catch(e){}
 addEventListener('pointerdown',()=>{try{A=A||new AudioContext();A.resume()}catch(e){}if(!mi)music()});
 function setL(l){L=l;document.documentElement.lang=l;document.documentElement.dir=l=='ar'?'rtl':'ltr';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=T[l][e.dataset.k]);$('lang').textContent=T[l].l;D.L=l;sv();chips();if(playing&&!run&&round<10)ask(true)}
 function sel(k,v){if(k=='g')g=v;else o=v;['gb','gg'].forEach(i=>$(i).classList.toggle('on',i==(g=='boy'?'gb':'gg')));['o0','o1'].forEach((i,n)=>$(i).classList.toggle('on',n==o));D.g=g;D.o=o;sv();build()}
